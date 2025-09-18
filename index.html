@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apfel-Fänger-Spiel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .game-container {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        canvas {
+            border: 2px solid #cbd5e1;
+            background-color: #f0f9ff;
+            border-radius: 8px;
+            touch-action: none; /* Verhindert das Standardverhalten von Touch-Gesten */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .button {
+            padding: 12px 24px;
+            background-color: #34d399;
+            color: white;
+            border-radius: 9999px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        .button:hover {
+            background-color: #10b981;
+            transform: translateY(-2px);
+        }
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border: 2px solid #ef4444;
+            display: none;
+            z-index: 10;
+        }
+        .message-box h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+            <p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;!DOCTYPE html&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;html lang="de"&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;head&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;meta charset="UTF-8"&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;title&gt;Apfel-Fänger-Spiel&lt;/title&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;style&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">body {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">font-family: 'Inter', sans-serif;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">background-color: #e2e8f0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">display: flex;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">justify-content: center;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">align-items: center;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">flex-direction: column;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">min-height: 100vh;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">padding: 20px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">.game-container {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">background-color: white;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">padding: 24px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border-radius: 12px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">max-width: 90%;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">width: 100%;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">display: flex;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">flex-direction: column;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">align-items: center;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">gap: 20px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">canvas {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border: 2px solid #cbd5e1;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">background-color: #f0f9ff;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border-radius: 8px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">touch-action: none; /* Verhindert das Standardverhalten von Touch-Gesten */</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">box-shadow: inset 0 0 10px rgba(0,0,0,0.05);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">.game-info {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">display: flex;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">justify-content: space-between;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">width: 100%;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">font-size: 1.25rem;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">font-weight: 600;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">color: #1f2937;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">.button {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">padding: 12px 24px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">background-color: #34d399;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">color: white;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border-radius: 9999px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">font-weight: 700;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">cursor: pointer;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">transition: background-color 0.2s, transform 0.1s;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border: none;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">.button:hover {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">background-color: #10b981;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">transform: translateY(-2px);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">.message-box {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">position: absolute;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">top: 50%;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">left: 50%;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">transform: translate(-50%, -50%);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">background-color: rgba(255, 255, 255, 0.9);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">padding: 24px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border-radius: 12px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">text-align: center;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">border: 2px solid #ef4444;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">display: none;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">z-index: 10;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">.message-box h2 {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">font-size: 1.5rem;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">font-weight: 700;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">color: #ef4444;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">margin-bottom: 12px;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;/style&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;/head&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;body&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;div class="game-container"&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;h1 class="text-3xl font-extrabold text-gray-900 text-center"&gt;Apfel-Fänger&lt;/h1&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;div class="game-info"&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;span&gt;Punkte: &lt;span id="score"&gt;0&lt;/span&gt;&lt;/span&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;/div&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;canvas id="gameCanvas"&gt;&lt;/canvas&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;button id="restartButton" class="button"&gt;Spiel neu starten&lt;/button&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;/div&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;div id="messageBox" class="message-box"&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;h2 id="messageText"&gt;&lt;/h2&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">&lt;p class="text-gray-600"&gt;Klicke "Spiel neu starten", um es noch einmal zu versuchen!&lt;/p&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;/div&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;script&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">window.onload = function() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const canvas = document.getElementById('gameCanvas');</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const ctx = canvas.getContext('2d');</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const scoreEl = document.getElementById('score');</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const restartButton = document.getElementById('restartButton');</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const messageBox = document.getElementById('messageBox');</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const messageText = document.getElementById('messageText');</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let score = 0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let isGameOver = false;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let basket;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let apples = [];</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let appleCount = 0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let appleInterval;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Anpassung der Canvas-Größe an das Fenster</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function resizeCanvas() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">canvas.width = Math.min(window.innerWidth * 0.8, 600);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">canvas.height = Math.min(window.innerHeight * 0.7, 500);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">window.addEventListener('resize', resizeCanvas);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">resizeCanvas();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">class Basket {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">constructor() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.width = 80;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.height = 20;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.x = (canvas.width - this.width) / 2;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.y = canvas.height - 40;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.color = '#4b5563'; // Dunkelgrau</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">draw() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Zeichne das Körbchen als SVG oder Text</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.font = '30px Arial';</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.textAlign = 'center';</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.fillText('🧺', this.x + this.width / 2, this.y);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">class Apple {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">constructor() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.size = 20;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.x = Math.random() * (canvas.width - this.size);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.y = 0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.speed = 1.5 + Math.random() * 2;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">draw() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Zeichne den Apfel als Emoji</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.font = '30px Arial';</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.textAlign = 'center';</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.fillText('🍎', this.x + this.size / 2, this.y);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">update() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">this.y += this.speed;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function init() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">score = 0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">scoreEl.textContent = score;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">isGameOver = false;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples = [];</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">appleCount = 0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">basket = new Basket();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">messageBox.style.display = 'none';</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Alle 1,5 Sekunden einen neuen Apfel erstellen</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">clearInterval(appleInterval);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">appleInterval = setInterval(() =&gt; {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (!isGameOver) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples.push(new Apple());</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}, 1500);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function update() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (isGameOver) return;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Äpfel aktualisieren</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">for (let i = 0; i &lt; apples.length; i++) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples[i].update();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Kollisionserkennung</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (apples[i].y + apples[i].size &gt;= basket.y &amp;&amp;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples[i].x &gt;= basket.x &amp;&amp;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples[i].x &lt;= basket.x + basket.width) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">score++;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">scoreEl.textContent = score;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples.splice(i, 1); // Apfel entfernen</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">i--;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Spiel vorbei, wenn ein Apfel den Boden berührt</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (apples[i] &amp;&amp; apples[i].y &gt; canvas.height) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">isGameOver = true;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">showGameOver();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function draw() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">ctx.clearRect(0, 0, canvas.width, canvas.height);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">basket.draw();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">apples.forEach(apple =&gt; apple.draw());</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function gameLoop() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">update();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">draw();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (!isGameOver) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">requestAnimationFrame(gameLoop);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function showGameOver() {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">messageText.textContent = `Spiel vorbei! Dein Punktestand: ${score}`;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">messageBox.style.display = 'block';</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">clearInterval(appleInterval);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Steuerung mit Maus und Touch</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">function handleInput(e) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (isGameOver) return;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">let clientX;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (e.touches) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">clientX = e.touches[0].clientX;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">} else {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">clientX = e.clientX;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">const rect = canvas.getBoundingClientRect();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">basket.x = clientX - rect.left - basket.width / 2;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (basket.x &lt; 0) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">basket.x = 0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">if (basket.x + basket.width &gt; canvas.width) {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">basket.x = canvas.width - basket.width;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">canvas.addEventListener('mousemove', handleInput);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">canvas.addEventListener('touchmove', (e) =&gt; {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">e.preventDefault();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">handleInput(e);</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">}, { passive: false });</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">restartButton.addEventListener('click', () =&gt; {</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">init();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">gameLoop();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; page-break-before:always; line-height:normal">
+				&#xa0;
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">});</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">// Spielstart</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">init();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">gameLoop();</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&#xa0;&#xa0;&#xa0; </span><span style="font-family:Arial; color:#252525">};</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;/script&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:112%; font-size:20pt">
+				<span style="font-family:Arial">&#xa0;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;/body&gt;</span>
+			</p>
+			<p style="margin-top:0pt; margin-bottom:0pt; line-height:normal; font-size:20pt">
+				<span style="font-family:Arial; color:#252525">&lt;/html&gt;</span>
+			</p>
+
+	<p style="bottom: 10px; right: 10px; position: absolute;"><a href="https://wordtohtml.net" target="_blank" style="font-size:11px; color: #d0d0d0">Mit WordToHTML.net in HTML umgewandelt</a></p>
