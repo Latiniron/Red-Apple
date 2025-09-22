@@ -82,5 +82,176 @@
 </head>
 <body>
 
+<div class="game-container">
+    <h1 class="text-3xl font-extrabold text-gray-900 text-center">Apfel-Fänger</h1>
+    <div class="game-info">
+        <span>Punkte: <span id="score">0</span></span>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <button id="restartButton" class="button">Spiel neu starten</button>
+</div>
+
+<div id="messageBox" class="message-box">
+    <h2 id="messageText"></h2>
+    <p class="text-gray-600">Klicke "Spiel neu starten", um es noch einmal zu versuchen!</p>
+</div>
+
+<script>
+    window.onload = function() {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const restartButton = document.getElementById('restartButton');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+
+        let score = 0;
+        let isGameOver = false;
+        let basket;
+        let apples = [];
+        let appleCount = 0;
+        let appleInterval;
+
+        // Anpassung der Canvas-Größe an das Fenster
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.8, 600);
+            canvas.height = Math.min(window.innerHeight * 0.7, 500);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Basket {
+            constructor() {
+                this.width = 80;
+                this.height = 20;
+                this.x = (canvas.width - this.width) / 2;
+                this.y = canvas.height - 40;
+                this.color = '#4b5563'; // Dunkelgrau
+            }
+            draw() {
+                // Zeichne das Körbchen als SVG oder Text
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🧺', this.x + this.width / 2, this.y);
+            }
+        }
+
+        class Apple {
+            constructor() {
+                this.size = 20;
+                this.x = Math.random() * (canvas.width - this.size);
+                this.y = 0;
+                this.speed = 1.5 + Math.random() * 2;
+            }
+            draw() {
+                // Zeichne den Apfel als Emoji
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🍎', this.x + this.size / 2, this.y);
+            }
+            update() {
+                this.y += this.speed;
+            }
+        }
+
+        function init() {
+            score = 0;
+            scoreEl.textContent = score;
+            isGameOver = false;
+            apples = [];
+            appleCount = 0;
+            basket = new Basket();
+            messageBox.style.display = 'none';
+
+            // Alle 1,5 Sekunden einen neuen Apfel erstellen
+            clearInterval(appleInterval);
+            appleInterval = setInterval(() => {
+                if (!isGameOver) {
+                    apples.push(new Apple());
+                }
+            }, 1500);
+        }
+
+        function update() {
+            if (isGameOver) return;
+
+            // Äpfel aktualisieren
+            for (let i = 0; i < apples.length; i++) {
+                apples[i].update();
+
+                // Kollisionserkennung
+                if (apples[i].y + apples[i].size >= basket.y &&
+                    apples[i].x >= basket.x &&
+                    apples[i].x <= basket.x + basket.width) {
+                    score++;
+                    scoreEl.textContent = score;
+                    apples.splice(i, 1); // Apfel entfernen
+                    i--;
+                }
+
+                // Spiel vorbei, wenn ein Apfel den Boden berührt
+                if (apples[i] && apples[i].y > canvas.height) {
+                    isGameOver = true;
+                    showGameOver();
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            basket.draw();
+            apples.forEach(apple => apple.draw());
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (!isGameOver) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function showGameOver() {
+            messageText.textContent = `Spiel vorbei! Dein Punktestand: ${score}`;
+            messageBox.style.display = 'block';
+            clearInterval(appleInterval);
+        }
+
+        // Steuerung mit Maus und Touch
+        function handleInput(e) {
+            if (isGameOver) return;
+            let clientX;
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+            } else {
+                clientX = e.clientX;
+            }
+            const rect = canvas.getBoundingClientRect();
+            basket.x = clientX - rect.left - basket.width / 2;
+            if (basket.x < 0) {
+                basket.x = 0;
+            }
+            if (basket.x + basket.width > canvas.width) {
+                basket.x = canvas.width - basket.width;
+            }
+        }
+
+        canvas.addEventListener('mousemove', handleInput);
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            handleInput(e);
+        }, { passive: false });
+
+        restartButton.addEventListener('click', () => {
+            init();
+            gameLoop();
+        });
+
+        // Spielstart
+        init();
+        gameLoop();
+    };
+</script>
+
 </body>
 </html>
