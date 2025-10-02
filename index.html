@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="">
-<meta property="og:description" content="">
-<meta property="og:type" content="article">
-<meta property="og:image" content="http://latiniron.github.io/Red-Apple/share.png">
-    <title>Catch the apple</title>
+    <meta property="og:title" content="Jet Buster - Sternenjagd">
+    <meta property="og:description" content="Fange Sterne und Bälle mit deinem Jet!">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="http://latiniron.github.io/Red-Apple/share.png"> 
+    <title>Jet Buster - Sternenjagd</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* CSS-Variablen für das Jet-Spiel */
+        :root {
+            --jet-color: #00BFFF; /* Himmelblau für den Jet */
+            --star-color: #ffd700; /* Gold für Sterne */
+            --ball-color: #ff6347; /* Tomatenrot für Bälle, passend zum ursprünglichen Jet-Booster */
+            --joystick-red: #d9534f; /* Roter Joystick */
+        }
+
+        /* Übernommene Basis-Stile von Catch-the-Apple */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #e2e8f0;
@@ -31,13 +40,16 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
+            max-width: 700px; /* Begrenzung der Breite */
         }
         canvas {
             border: 2px solid #cbd5e1;
-            background-color: #f0f9ff;
+            background-color: #000033; /* Weltraum-Hintergrund */
             border-radius: 8px;
-            touch-action: none; /* Verhindert das Standardverhalten von Touch-Gesten */
+            touch-action: none;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            width: 100%;
+            height: 350px; /* Feste Höhe für Canvas im Layout */
         }
         .game-info {
             display: flex;
@@ -49,7 +61,7 @@
         }
         .button {
             padding: 12px 24px;
-            background-color: #34d399;
+            background-color: var(--jet-color);
             color: white;
             border-radius: 9999px;
             font-weight: 700;
@@ -58,204 +70,502 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border: none;
         }
+        .button.red {
+            background-color: #ef4444;
+        }
         .button:hover {
-            background-color: #10b981;
+            background-color: #0099CC;
             transform: translateY(-2px);
         }
+        .button.red:hover {
+            background-color: #dc2626;
+        }
+
         .message-box {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 24px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             text-align: center;
-            border: 2px solid #ef4444;
+            border: 2px solid #34d399;
             display: none;
             z-index: 10;
         }
         .message-box h2 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #ef4444;
+            color: #34d399;
             margin-bottom: 12px;
+        }
+        .message-box.game-over h2 {
+            color: #ef4444;
+        }
+
+        /* NEUE CONTROLLER-STILE */
+        #controller-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 650px; /* Passend zur game-container Breite */
+            margin-top: 15px;
+            padding: 10px 0;
+        }
+        #joystick-area {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        #joystick-base {
+            width: 80px;
+            height: 80px;
+            background: #4b5563; 
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+        }
+        #joystick-handle {
+            width: 40px;
+            height: 40px;
+            background: var(--joystick-red);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            cursor: grab;
+            touch-action: none; 
+        }
+
+        .control-button {
+            flex-shrink: 0;
+            width: 100px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <h1 class="text-3xl font-extrabold text-gray-900 text-center">Apfel-Fänger</h1>
+    <h1 class="text-3xl font-extrabold text-gray-900 text-center">Jet Buster</h1>
     <div class="game-info">
-        <span>Punkte: <span id="score">0</span></span>
+        <span>Gefangen: <span id="score">0</span></span>
+        <span>Verpasst: <span id="missed">0</span> / 5</span>
     </div>
     <canvas id="gameCanvas"></canvas>
-    <button id="restartButton" class="button">Spiel neu starten</button>
+</div>
+
+<div id="controller-area">
+    <div class="control-button">
+        <button id="startButton" class="button">START</button>
+    </div>
+    
+    <div id="joystick-area">
+        <div id="joystick-base"></div>
+        <div id="joystick-handle"></div>
+    </div>
+
+    <div class="control-button">
+        <button id="stopButton" class="button red" disabled>BEENDEN</button>
+    </div>
 </div>
 
 <div id="messageBox" class="message-box">
-    <h2 id="messageText"></h2>
-    <p class="text-gray-600">Klicke "Spiel neu starten", um es noch einmal zu versuchen!</p>
+    <h2 id="messageText">Bereit zum Start!</h2>
+    <p class="text-gray-600">Drücke **START** um die Sternenjagd zu beginnen.</p>
 </div>
 
 <script>
-    window.onload = function() {
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const restartButton = document.getElementById('restartButton');
-        const messageBox = document.getElementById('messageBox');
-        const messageText = document.getElementById('messageText');
+    // ***************************************************************
+    // Globale Konstanten & Setup
+    // ***************************************************************
 
-        let score = 0;
-        let isGameOver = false;
-        let basket;
-        let apples = [];
-        let appleCount = 0;
-        let appleInterval;
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const missedEl = document.getElementById('missed');
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+    const MAX_MISSED = 5;
 
-        // Anpassung der Canvas-Größe an das Fenster
-        function resizeCanvas() {
-            canvas.width = Math.min(window.innerWidth * 0.8, 600);
-            canvas.height = Math.min(window.innerHeight * 0.7, 500);
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+    // Spiel-Zustand
+    let gameRunning = false;
+    let score = 0;
+    let missedCount = 0;
+    let animationFrameId;
 
-        class Basket {
-            constructor() {
-                this.width = 80;
-                this.height = 20;
-                this.x = (canvas.width - this.width) / 2;
-                this.y = canvas.height - 40;
-                this.color = '#4b5563'; // Dunkelgrau
-            }
-            draw() {
-                // Zeichne das Körbchen als SVG oder Text
-                ctx.font = '30px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('🧺', this.x + this.width / 2, this.y);
-            }
-        }
+    // Jet-Parameter
+    const JET_SPEED = 5;
+    const JET_WIDTH = 60;
+    const JET_HEIGHT = 40;
+    const JET_BOTTOM_OFFSET = 30;
 
-        class Apple {
-            constructor() {
-                this.size = 20;
-                this.x = Math.random() * (canvas.width - this.size);
-                this.y = 0;
-                this.speed = 1.5 + Math.random() * 2;
-            }
-            draw() {
-                // Zeichne den Apfel als Emoji
-                ctx.font = '30px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('🍎', this.x + this.size / 2, this.y);
-            }
-            update() {
-                this.y += this.speed;
-            }
-        }
-
-        function init() {
-            score = 0;
-            scoreEl.textContent = score;
-            isGameOver = false;
-            apples = [];
-            appleCount = 0;
-            basket = new Basket();
-            messageBox.style.display = 'none';
-
-            // Alle 1,5 Sekunden einen neuen Apfel erstellen
-            clearInterval(appleInterval);
-            appleInterval = setInterval(() => {
-                if (!isGameOver) {
-                    apples.push(new Apple());
-                }
-            }, 1500);
-        }
-
-        function update() {
-            if (isGameOver) return;
-
-            // Äpfel aktualisieren
-            for (let i = 0; i < apples.length; i++) {
-                apples[i].update();
-
-                // Kollisionserkennung
-                if (apples[i].y + apples[i].size >= basket.y &&
-                    apples[i].x >= basket.x &&
-                    apples[i].x <= basket.x + basket.width) {
-                    score++;
-                    scoreEl.textContent = score;
-                    apples.splice(i, 1); // Apfel entfernen
-                    i--;
-                }
-
-                // Spiel vorbei, wenn ein Apfel den Boden berührt
-                if (apples[i] && apples[i].y > canvas.height) {
-                    isGameOver = true;
-                    showGameOver();
-                }
-            }
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            basket.draw();
-            apples.forEach(apple => apple.draw());
-        }
-
-        function gameLoop() {
-            update();
-            draw();
-            if (!isGameOver) {
-                requestAnimationFrame(gameLoop);
-            }
-        }
-
-        function showGameOver() {
-            messageText.textContent = `Spiel vorbei! Dein Punktestand: ${score}`;
-            messageBox.style.display = 'block';
-            clearInterval(appleInterval);
-        }
-
-        // Steuerung mit Maus und Touch
-        function handleInput(e) {
-            if (isGameOver) return;
-            let clientX;
-            if (e.touches) {
-                clientX = e.touches[0].clientX;
-            } else {
-                clientX = e.clientX;
-            }
-            const rect = canvas.getBoundingClientRect();
-            basket.x = clientX - rect.left - basket.width / 2;
-            if (basket.x < 0) {
-                basket.x = 0;
-            }
-            if (basket.x + basket.width > canvas.width) {
-                basket.x = canvas.width - basket.width;
-            }
-        }
-
-        canvas.addEventListener('mousemove', handleInput);
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            handleInput(e);
-        }, { passive: false });
-
-        restartButton.addEventListener('click', () => {
-            init();
-            gameLoop();
-        });
-
-        // Spielstart
-        init();
-        gameLoop();
+    // Spieler-Objekt (Jet)
+    let player = {
+        x: 0, 
+        y: 0,
+        width: JET_WIDTH,
+        height: JET_HEIGHT,
+        xSpeed: 0,
     };
+
+    // Fallende Objekte Parameter
+    const STAR_SIZE = 12; // Radius der Sterne
+    const BALL_SIZE = 15; // Radius der Bälle
+    let objectSpawnTimer = 0;
+    const BASE_SPAWN_RATE = 60; // Frames pro Spawn
+    const OBJECT_TYPES = ['star', 'ball']; // Objekte, die gespawnt werden können
+
+    // Spiel-Objekte
+    let fallingObjects = []; 
+    
+    // Joystick-Steuerung
+    let joystickActive = false;
+    let joystickOffsetX = 0; 
+    const JOYSTICK_MAX_DIST = 30; 
+    const JOYSTICK_SENSITIVITY = 0.1;
+
+    // Canvas Größe anpassen
+    function resizeCanvas() {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        
+        // Jet-Position aktualisieren, falls Größe sich ändert
+        player.x = (canvas.width - JET_WIDTH) / 2;
+        player.y = canvas.height - JET_HEIGHT - JET_BOTTOM_OFFSET;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+
+    // ***************************************************************
+    // FUNKTIONEN
+    // ***************************************************************
+    
+    function initGame() {
+        score = 0;
+        missedCount = 0;
+        fallingObjects = [];
+        objectSpawnTimer = 0;
+        
+        player.x = (canvas.width - JET_WIDTH) / 2;
+        player.y = canvas.height - JET_HEIGHT - JET_BOTTOM_OFFSET;
+        player.xSpeed = 0;
+
+        scoreEl.textContent = score;
+        missedEl.textContent = `${missedCount} / ${MAX_MISSED}`;
+
+        messageBox.style.display = 'none';
+        messageBox.classList.remove('game-over');
+    }
+
+    function startGame() {
+        if (gameRunning) return;
+        initGame();
+        
+        gameRunning = true;
+        startButton.disabled = true;
+        stopButton.disabled = false;
+
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(gameLoop);
+    }
+    window.startGame = startGame; // Für Button-Klick verfügbar machen
+
+    function stopGame() {
+        cancelAnimationFrame(animationFrameId);
+        gameRunning = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        
+        showEndMessage(false, `Spiel beendet! Dein Score: ${score}.`);
+    }
+    window.stopGame = stopGame;
+
+    function spawnObject() {
+        const type = OBJECT_TYPES[Math.floor(Math.random() * OBJECT_TYPES.length)];
+        const size = type === 'star' ? STAR_SIZE : BALL_SIZE;
+        
+        const objectX = Math.random() * (canvas.width - size * 2) + size;
+        const baseSpeed = 2 + (score / 50); // Schwierigkeit steigt mit Score
+        const speed = baseSpeed + Math.random() * 1.5;
+        
+        fallingObjects.push({
+            x: objectX,
+            y: -size,
+            radius: size,
+            speed: speed,
+            type: type,
+        });
+    }
+
+    function handleInput() {
+        let targetXSpeed = joystickOffsetX * JOYSTICK_SENSITIVITY * JET_SPEED;
+        player.xSpeed += (targetXSpeed - player.xSpeed) * 0.2; 
+    }
+
+    // Prüft Kollision zwischen Jet (Rechteck) und Objekt (Kreis)
+    function isCollidingRectCircle(rect, circle) {
+        const closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
+        const closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
+
+        const distX = circle.x - closestX;
+        const distY = circle.y - closestY;
+
+        return (distX * distX + distY * distY) < (circle.radius * circle.radius);
+    }
+    
+    function update(deltaTime) {
+        if (!gameRunning) return;
+
+        // Spieler-Bewegung (Jet)
+        handleInput();
+        player.x += player.xSpeed;
+        
+        // Randbegrenzung
+        if (player.x < 0) player.x = 0;
+        if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+        
+        // Objekt-Logik
+        objectSpawnTimer++;
+        const spawnRate = Math.max(25, BASE_SPAWN_RATE - Math.floor(score / 10) * 5);
+        if (objectSpawnTimer >= spawnRate) {
+            spawnObject();
+            objectSpawnTimer = 0;
+        }
+
+        // Objekt-Bewegung und Kollision
+        for (let i = fallingObjects.length - 1; i >= 0; i--) {
+            const obj = fallingObjects[i];
+            
+            obj.y += obj.speed;
+
+            if (isCollidingRectCircle(player, { x: obj.x, y: obj.y, radius: obj.radius })) {
+                score++;
+                fallingObjects.splice(i, 1); 
+            } 
+            else if (obj.y - obj.radius > canvas.height) { // Objekt verpasst
+                missedCount++;
+                fallingObjects.splice(i, 1); 
+                
+                if (missedCount >= MAX_MISSED) {
+                     gameOver();
+                     return;
+                }
+            }
+        }
+        
+        scoreEl.textContent = score;
+        missedEl.textContent = `${missedCount} / ${MAX_MISSED}`;
+    }
+
+    // ***************************************************************
+    // ZEICHNEN (DRAW)
+    // ***************************************************************
+
+    function drawRect(x, y, w, h, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    }
+
+    function drawStar(obj) {
+        const spikes = 5;
+        const outerRadius = obj.radius;
+        const innerRadius = obj.radius / 2;
+        let rot = Math.PI / 2 * 3;
+        let x = obj.x;
+        let y = obj.y;
+        let step = Math.PI / spikes;
+
+        ctx.strokeStyle = 'var(--star-color)';
+        ctx.fillStyle = 'var(--star-color)';
+        ctx.beginPath();
+        ctx.moveTo(x, y - outerRadius);
+
+        for (let i = 0; i < spikes; i++) {
+            x = obj.x + Math.cos(rot) * outerRadius;
+            y = obj.y + Math.sin(rot) * outerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+
+            x = obj.x + Math.cos(rot) * innerRadius;
+            y = obj.y + Math.sin(rot) * innerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+        }
+        ctx.lineTo(obj.x, obj.y - outerRadius);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function drawBall(obj) {
+        ctx.fillStyle = 'var(--ball-color)';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawJet() {
+        ctx.fillStyle = 'var(--jet-color)';
+        const p = player;
+        
+        // Hauptkörper (Rechteck)
+        drawRect(p.x, p.y + p.height * 0.1, p.width, p.height * 0.8, 'var(--jet-color)');
+        
+        // Flügel
+        ctx.beginPath();
+        ctx.fillStyle = 'var(--jet-color)';
+        ctx.moveTo(p.x + p.width * 0.1, p.y + p.height * 0.9); 
+        ctx.lineTo(p.x - 5, p.y + p.height); 
+        ctx.lineTo(p.x + p.width * 0.9, p.y + p.height * 0.9); 
+        ctx.fill();
+
+        // Cockpit
+        drawRect(p.x + p.width * 0.3, p.y, p.width * 0.4, p.height * 0.4, '#ADD8E6');
+
+        // Düsen (hinten)
+        drawRect(p.x + p.width * 0.1, p.y + p.height * 0.85, p.width * 0.2, p.height * 0.15, '#FF4500');
+        drawRect(p.x + p.width * 0.7, p.y + p.height * 0.85, p.width * 0.2, p.height * 0.15, '#FF4500');
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for (const obj of fallingObjects) {
+            if (obj.type === 'star') {
+                drawStar(obj);
+            } else {
+                drawBall(obj);
+            }
+        }
+
+        drawJet();
+    }
+
+    // ***************************************************************
+    // GAME-LOOP & ENDE
+    // ***************************************************************
+
+    function gameLoop(timestamp) {
+        // Feste 60 FPS Simulation (vereinfacht, da DeltaTime nicht verwendet wird)
+        const deltaTime = 1000 / 60; 
+        
+        if (gameRunning) {
+            update(deltaTime);
+            draw();
+        } else {
+            // Wenn das Spiel nicht läuft, zeichne nur den Jet, aber keine fallenden Objekte
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawJet();
+        }
+
+        animationFrameId = requestAnimationFrame(gameLoop);
+    }
+    
+    function gameOver() {
+        cancelAnimationFrame(animationFrameId);
+        gameRunning = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        
+        let message = `**GAME OVER!** Du hast ${missedCount} Objekte verpasst. Dein Score: ${score}.`;
+        showEndMessage(true, message);
+    }
+
+    function showEndMessage(isGameOver, text) {
+        messageBox.classList.toggle('game-over', isGameOver);
+        messageText.innerHTML = text;
+        messageBox.style.display = 'block';
+    }
+
+
+    // ***************************************************************
+    // JOYSTICK-STEUERUNG
+    // ***************************************************************
+
+    const joystickHandle = document.getElementById('joystick-handle');
+    const joystickBase = document.getElementById('joystick-base');
+
+    let baseCenterX, baseCenterY;
+
+    function getPointerPosition(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function startDrag(e) {
+        e.preventDefault(); 
+        if (!gameRunning) return; 
+        joystickActive = true;
+        
+        const baseRect = joystickBase.getBoundingClientRect();
+        baseCenterX = baseRect.left + baseRect.width / 2;
+        baseCenterY = baseRect.top + baseRect.height / 2;
+        
+        joystickHandle.style.cursor = 'grabbing';
+    }
+
+    function drag(e) {
+        if (!joystickActive || !gameRunning) return;
+        e.preventDefault(); 
+        const pointerPos = getPointerPosition(e);
+
+        let deltaX = pointerPos.x - baseCenterX;
+        let deltaY = 0; 
+        
+        if (Math.abs(deltaX) > JOYSTICK_MAX_DIST) {
+            deltaX = Math.sign(deltaX) * JOYSTICK_MAX_DIST;
+        }
+
+        joystickOffsetX = deltaX;
+        
+        joystickHandle.style.transform = `translate(calc(-50% + ${deltaX}px), -50%)`; 
+    }
+
+    function endDrag() {
+        joystickActive = false;
+        joystickOffsetX = 0;
+        joystickHandle.style.transform = 'translate(-50%, -50%)';
+        joystickHandle.style.cursor = 'grab';
+    }
+
+    // Touch/Pointer Events für Joystick
+    joystickHandle.addEventListener('pointerdown', startDrag);
+    document.addEventListener('pointermove', drag);
+    document.addEventListener('pointerup', endDrag);
+    document.addEventListener('pointercancel', endDrag); 
+
+    // ***************************************************************
+    // INITIALISIERUNG
+    // ***************************************************************
+    
+    // Initial-Setup
+    document.addEventListener('DOMContentLoaded', () => {
+        resizeCanvas();
+        initGame();
+        // Starte den Loop, um den Jet auch im Startbildschirm zu zeichnen
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(gameLoop);
+        
+        // Zeige Start-Nachricht
+        messageBox.style.display = 'block';
+        startButton.onclick = startGame;
+        stopButton.onclick = stopGame;
+    });
 </script>
 
 </body>
 </html>
+
